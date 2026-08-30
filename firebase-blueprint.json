@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "UserProfile": {
+      "collection": "users",
+      "fields": {
+        "id": { "type": "string", "description": "User UID from Firebase Auth" },
+        "name": { "type": "string", "description": "User display name" },
+        "email": { "type": "string", "description": "User email address" },
+        "walletAddress": { "type": "string", "description": "Primary EVM wallet address" },
+        "role": { "type": "string", "description": "User role: trader, pro, admin" },
+        "createdAt": { "type": "number", "description": "Timestamp of account creation" },
+        "trialEndsAt": { "type": "number", "description": "Timestamp when 7-day trial ends" },
+        "subscriptionPlan": { "type": "string", "description": "free_trial, monthly ($100/mo), annual ($1000/yr), or expired" },
+        "subscriptionStatus": { "type": "string", "description": "active, trialing, expired, canceled" },
+        "subscriptionExpiresAt": { "type": "number", "description": "Expiration timestamp of paid plan" },
+        "savedWallets": { "type": "array", "description": "List of saved wallet addresses with labels" },
+        "totalProfitGeneratedUsd": { "type": "number", "description": "Lifetime profit tracking" },
+        "lastLoginAt": { "type": "number", "description": "Last login timestamp" }
+      }
+    },
+    "PaymentRecord": {
+      "collection": "payments",
+      "fields": {
+        "id": { "type": "string", "description": "Payment record ID" },
+        "userId": { "type": "string", "description": "User UID" },
+        "userEmail": { "type": "string", "description": "User Email" },
+        "plan": { "type": "string", "description": "monthly ($100) or annual ($1000)" },
+        "amountUsd": { "type": "number", "description": "Payment amount in USD" },
+        "paymentMethod": { "type": "string", "description": "crypto_usdc, crypto_eth, card" },
+        "txHash": { "type": "string", "description": "On-chain or receipt hash" },
+        "timestamp": { "type": "number", "description": "Payment timestamp" },
+        "status": { "type": "string", "description": "COMPLETED, PENDING, REFUNDED" }
+      }
+    }
+  }
+}

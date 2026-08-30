@@ -169,3 +169,86 @@ export interface AiAuditResult {
   technicalNotes: string[];
   confidenceScore: number;
 }
+
+export interface WalletState {
+  isConnected: boolean;
+  address: string | null;
+  walletType: 'metamask' | 'rabby' | 'coinbase' | 'walletconnect' | 'browser_injected' | 'demo_vault' | null;
+  networkId: string;
+  chainId: number;
+  balanceEth: number;
+  balanceUsdt: number;
+  isConnecting: boolean;
+}
+
+export interface VaultBalanceItem {
+  symbol: string;
+  name: string;
+  amount: number;
+  basePriceUsd: number;
+  valueUsd: number;
+  color: string;
+  address: string;
+  isWithdrawable: boolean;
+}
+
+export interface WithdrawalRecord {
+  id: string;
+  timestamp: number;
+  tokenSymbol: string;
+  amount: number;
+  amountUsd: number;
+  destinationAddress: string;
+  networkId: string;
+  txHash: string;
+  blockNumber: number;
+  status: 'CONFIRMED' | 'PENDING' | 'FAILED';
+  method: 'VAULT_HARVEST' | 'EMERGENCY_RESCUE' | 'EOA_TRANSFER';
+  gasFeeUsd: number;
+  notes?: string;
+}
+
+export interface SavedWalletItem {
+  id: string;
+  address: string;
+  label: string;
+  network: string;
+  addedAt: number;
+  isPrimary?: boolean;
+}
+
+export type SubscriptionPlan = 'free_trial' | 'monthly' | 'annual' | 'expired';
+export type SubscriptionStatus = 'active' | 'trialing' | 'expired' | 'canceled';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  walletAddress: string;
+  role: 'trader' | 'pro' | 'admin';
+  createdAt: number;
+  trialEndsAt: number; // 7 days after createdAt
+  subscriptionPlan: SubscriptionPlan;
+  subscriptionStatus: SubscriptionStatus;
+  subscriptionExpiresAt: number;
+  savedWallets: SavedWalletItem[];
+  totalProfitGeneratedUsd: number;
+  arbitrageTradesExecuted: number;
+  lastLoginAt: number;
+  isSyncedWithDb?: boolean;
+}
+
+export interface PaymentRecord {
+  id: string;
+  userId: string;
+  userEmail: string;
+  plan: 'monthly' | 'annual';
+  amountUsd: number; // 100 or 1000
+  paymentMethod: 'crypto_usdc' | 'crypto_usdt' | 'crypto_eth' | 'card_stripe';
+  txHash: string;
+  timestamp: number;
+  status: 'COMPLETED' | 'PENDING' | 'REFUNDED';
+  periodStart: number;
+  periodEnd: number;
+}
+
