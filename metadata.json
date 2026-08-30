@@ -1,0 +1,8 @@
+{
+  "name": "Remix Crypto Flash Loan Arbitrage Bot",
+  "description": "Real-time DeFi flash loan arbitrage scanner, automated execution engine, DEX spread analyzer, and smart contract exporter across Ethereum and L2 networks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
