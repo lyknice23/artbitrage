@@ -258,3 +258,58 @@ export const checkAccessStatus = (profile: UserProfile | null): {
     statusLabel: 'Free Trial Expired',
   };
 };
+
+/**
+ * Save User API Keys & RPC Node Settings to Firestore Database
+ */
+export const saveUserNodeConfigToFirestore = async (userId: string, nodeConfig: any): Promise<void> => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    await setDoc(userDocRef, {
+      nodeSettings: nodeConfig,
+      apiKeys: {
+        alchemy: nodeConfig.alchemyApiKey || '',
+        infura: nodeConfig.infuraProjectId || '',
+        quicknode: nodeConfig.quicknodeEndpoint || '',
+        etherscan: nodeConfig.etherscanApiKey || '',
+        coingecko: nodeConfig.coingeckoApiKey || '',
+        customRpc: nodeConfig.customRpcUrl || '',
+        providerType: nodeConfig.providerType || 'flashbots_fast',
+        lastUpdated: Date.now()
+      },
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    // Also log to subcollection for auditing / history
+    const apiKeysColRef = collection(db, 'users', userId, 'api_keys_vault');
+    await addDoc(apiKeysColRef, {
+      providerType: nodeConfig.providerType,
+      hasAlchemyKey: Boolean(nodeConfig.alchemyApiKey),
+      hasInfuraKey: Boolean(nodeConfig.infuraProjectId),
+      hasQuicknodeKey: Boolean(nodeConfig.quicknodeEndpoint),
+      hasEtherscanKey: Boolean(nodeConfig.etherscanApiKey),
+      timestamp: serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Error saving API keys and node config to Firestore:', error);
+    throw error;
+  }
+};
+
+/**
+ * Load User API Keys & RPC Node Settings from Firestore Database
+ */
+export const loadUserNodeConfigFromFirestore = async (userId: string): Promise<any | null> => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const snap = await getDoc(userDocRef);
+    if (snap.exists() && snap.data()?.nodeSettings) {
+      return snap.data().nodeSettings;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error loading API keys from Firestore:', error);
+    return null;
+  }
+};
+

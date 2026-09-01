@@ -30,6 +30,7 @@ import {
 import confetti from 'canvas-confetti';
 import { Network, WalletState, VaultBalanceItem, WithdrawalRecord, BotStats } from '../types';
 import { TOKENS, NETWORKS } from '../data/chainsAndDexes';
+import { VaultAssetPieChart } from './VaultAssetPieChart';
 
 interface WalletWithdrawSpaceProps {
   activeNetwork: Network;
@@ -217,6 +218,21 @@ export const WalletWithdrawSpace: React.FC<WalletWithdrawSpaceProps> = ({
         </div>
       </div>
 
+      {/* Vault Asset Allocation Recharts Pie Chart Visualization */}
+      <VaultAssetPieChart
+        vaultBalances={vaultBalances}
+        selectedTokenSymbol={selectedTokenSymbol}
+        onSelectToken={(sym) => {
+          setSelectedTokenSymbol(sym);
+          const tok = vaultBalances.find((v) => v.symbol === sym);
+          if (tok) {
+            const safeInit = tok.amount * 0.5;
+            setWithdrawAmount(safeInit > 0 ? (safeInit < 1 ? safeInit.toFixed(4) : safeInit.toFixed(2)) : '0');
+          }
+        }}
+        totalVaultValueUsd={totalVaultValueUsd}
+      />
+
       {/* Main Grid: Wallet Connection Status & Withdraw Form */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
@@ -360,15 +376,18 @@ export const WalletWithdrawSpace: React.FC<WalletWithdrawSpaceProps> = ({
                   </button>
                 </div>
 
-                <div className="pt-2 border-t border-[#23282f]">
+                <div className="pt-2 border-t border-[#23282f] space-y-2">
                   <button
-                    onClick={() => onConnectWallet('demo_vault')}
+                    onClick={() => onConnectWallet('metamask')}
                     disabled={walletState.isConnecting}
-                    className="w-full flex items-center justify-center gap-2 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-sm shadow-blue-900/40"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-900/40"
                   >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    <span>Instant Sandbox Wallet Connect</span>
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    <span>Connect Browser Wallet (Live On-Chain)</span>
                   </button>
+                  <p className="text-[10px] text-slate-500 text-center">
+                    Authenticates directly with your Web3 provider (MetaMask / Rabby / Coinbase) for verified on-chain broadcasts.
+                  </p>
                 </div>
               </div>
             )}

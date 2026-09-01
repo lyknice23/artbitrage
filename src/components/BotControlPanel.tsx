@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Sliders, 
   Bot, 
   ShieldCheck, 
+  ShieldAlert,
   DollarSign, 
   Percent, 
   RefreshCw, 
   CheckCircle2,
   Sparkles,
   Layers,
-  Fuel
+  Fuel,
+  Lock,
+  Info,
+  ExternalLink
 } from 'lucide-react';
 import { BotConfig, BotStats } from '../types';
 import { FLASH_LOAN_PROVIDERS, DEXES, DEFAULT_MONITORED_PAIRS } from '../data/chainsAndDexes';
@@ -29,6 +33,18 @@ export const BotControlPanel: React.FC<BotControlPanelProps> = ({
   onResetStats,
   onOpenAdvancedConfig,
 }) => {
+  const [showRpcInfo, setShowRpcInfo] = useState<boolean>(false);
+
+  const isFlashbotsActive = config.flashbotsProtect !== false && config.mevProtection;
+
+  const handleToggleFlashbotsProtect = (checked: boolean) => {
+    setConfig((prev) => ({
+      ...prev,
+      mevProtection: checked,
+      flashbotsProtect: checked,
+    }));
+  };
+
   const applyPreset = (preset: 'conservative' | 'aggressive' | 'l2' | 'zerofee') => {
     switch (preset) {
       case 'conservative':
@@ -38,6 +54,7 @@ export const BotControlPanel: React.FC<BotControlPanelProps> = ({
           minRoiPercent: 0.15,
           maxSlippagePercent: 0.25,
           mevProtection: true,
+          flashbotsProtect: true,
           gasMultiplier: 1.0,
           simulateReverts: true,
           scanIntervalMs: 2500,
@@ -50,6 +67,7 @@ export const BotControlPanel: React.FC<BotControlPanelProps> = ({
           minRoiPercent: 0.04,
           maxSlippagePercent: 0.8,
           mevProtection: true,
+          flashbotsProtect: true,
           gasMultiplier: 1.5,
           simulateReverts: true,
           scanIntervalMs: 1200,
@@ -62,6 +80,7 @@ export const BotControlPanel: React.FC<BotControlPanelProps> = ({
           minRoiPercent: 0.02,
           maxSlippagePercent: 0.3,
           mevProtection: false,
+          flashbotsProtect: false,
           gasMultiplier: 1.1,
           simulateReverts: false,
           scanIntervalMs: 1000,
@@ -75,6 +94,7 @@ export const BotControlPanel: React.FC<BotControlPanelProps> = ({
           minRoiPercent: 0.05,
           maxSlippagePercent: 0.4,
           mevProtection: true,
+          flashbotsProtect: true,
           scanIntervalMs: 2000,
         }));
         break;
@@ -281,29 +301,66 @@ export const BotControlPanel: React.FC<BotControlPanelProps> = ({
           </div>
         </div>
 
-        {/* MEV Protection & Reverts */}
-        <div className="flex flex-col justify-between rounded-md border border-[#30363d] bg-[#161b22] p-3">
+        {/* Flashbots Protect & Private RPC Routing Toggle */}
+        <div className={`flex flex-col justify-between rounded-md border p-3 transition-colors ${
+          isFlashbotsActive 
+            ? 'border-emerald-500/40 bg-emerald-950/10' 
+            : 'border-[#30363d] bg-[#161b22]'
+        }`}>
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
-              <ShieldCheck className="h-3.5 w-3.5 text-blue-400" /> Flashbots
-            </span>
+            <div className="flex items-center gap-1.5">
+              {isFlashbotsActive ? (
+                <ShieldCheck className="h-4 w-4 text-emerald-400" />
+              ) : (
+                <ShieldAlert className="h-4 w-4 text-amber-400" />
+              )}
+              <span className="text-xs font-semibold text-slate-200">
+                Flashbots Protect
+              </span>
+              <button
+                type="button"
+                id="flashbots-rpc-info-btn"
+                onClick={() => setShowRpcInfo(!showRpcInfo)}
+                className="text-slate-500 hover:text-blue-400 transition-colors"
+                title="Private RPC Configuration Info"
+              >
+                <Info className="h-3 w-3" />
+              </button>
+            </div>
             <label className="relative inline-flex cursor-pointer items-center">
               <input
-                id="mev-protection-toggle"
+                id="flashbots-protect-toggle"
                 type="checkbox"
-                checked={config.mevProtection}
-                onChange={(e) => setConfig((prev) => ({ ...prev, mevProtection: e.target.checked }))}
+                checked={isFlashbotsActive}
+                onChange={(e) => handleToggleFlashbotsProtect(e.target.checked)}
                 className="peer sr-only"
               />
-              <div className="peer h-5 w-9 rounded-full bg-[#23282f] after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"></div>
+              <div className="peer h-5 w-9 rounded-full bg-[#23282f] after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"></div>
             </label>
           </div>
-          <div className="mt-2 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400">Anti-Sandwich</span>
-            <span className={config.mevProtection ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
-              {config.mevProtection ? 'Active' : 'Off'}
+
+          <div className="mt-2.5 flex items-center justify-between text-[11px]">
+            <span className="text-slate-400 flex items-center gap-1">
+              <Lock className="h-2.5 w-2.5 text-slate-400" /> Private RPC:
+            </span>
+            <span className={`font-semibold flex items-center gap-1 ${
+              isFlashbotsActive ? 'text-emerald-400' : 'text-amber-400'
+            }`}>
+              {isFlashbotsActive ? 'Bypass Mempool' : 'Public Mempool'}
             </span>
           </div>
+
+          <p className="mt-1 text-[10px] text-slate-400 leading-tight">
+            {isFlashbotsActive ? (
+              <span className="text-emerald-400/90">
+                Zero front-running risk via direct builder relays
+              </span>
+            ) : (
+              <span className="text-amber-400/80">
+                Transactions exposed to sandwich & MEV searchers
+              </span>
+            )}
+          </p>
         </div>
 
       </div>
@@ -396,6 +453,57 @@ export const BotControlPanel: React.FC<BotControlPanelProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Expandable Flashbots Protect & Private RPC Info Drawer */}
+      {showRpcInfo && (
+        <div className="mt-3 rounded-lg border border-emerald-500/30 bg-[#0b131a] p-3.5 space-y-3 animate-in fade-in slide-in-from-top-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-6 w-6 items-center justify-center rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                <Lock className="h-3.5 w-3.5" />
+              </div>
+              <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                Flashbots Protect & Private RPC Architecture
+              </h4>
+            </div>
+            <button
+              onClick={() => setShowRpcInfo(false)}
+              className="text-xs text-slate-500 hover:text-slate-300 font-mono px-2 py-0.5 rounded bg-[#161b22]"
+            >
+              Close
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-[11px]">
+            <div className="p-2.5 rounded bg-[#161b22] border border-[#30363d]">
+              <div className="text-emerald-400 font-semibold mb-1 flex items-center gap-1">
+                <ShieldCheck className="h-3 w-3" /> Anti-Frontrun Relay
+              </div>
+              <p className="text-slate-400 leading-relaxed text-[10px]">
+                Routes calldata directly to Ethereum block builders via <code className="text-emerald-300 font-mono">https://rpc.flashbots.net/fast</code>. Transactions are completely invisible in the public mempool.
+              </p>
+            </div>
+
+            <div className="p-2.5 rounded bg-[#161b22] border border-[#30363d]">
+              <div className="text-blue-400 font-semibold mb-1 flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3" /> Revert Gas Shield
+              </div>
+              <p className="text-slate-400 leading-relaxed text-[10px]">
+                If a slippage condition is breached or spread tightens before inclusion, the bundle is dropped off-chain without consuming on-chain gas fees.
+              </p>
+            </div>
+
+            <div className="p-2.5 rounded bg-[#161b22] border border-[#30363d]">
+              <div className="text-purple-400 font-semibold mb-1 flex items-center gap-1">
+                <Sparkles className="h-3 w-3" /> MEV-Share Kickbacks
+              </div>
+              <p className="text-slate-400 leading-relaxed text-[10px]">
+                Connects with MEV-Share protocol to return up to 90% of backrunning searcher value directly back to your vault as execution yield.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

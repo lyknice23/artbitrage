@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { BotConfig, Network } from '../types';
 import { DEXES, FLASH_LOAN_PROVIDERS, DEFAULT_MONITORED_PAIRS, TOKENS } from '../data/chainsAndDexes';
+import { CustomRpcApiKeySettings } from './CustomRpcApiKeySettings';
 
 export interface NamedStrategyPreset {
   id: string;
@@ -1035,28 +1036,53 @@ export const CustomStrategyParameters: React.FC<CustomStrategyParametersProps> =
           </p>
         </div>
 
-        {/* MEV Frontrun Protection */}
+        {/* MEV Frontrun Protection / Flashbots Protect */}
         <div className="rounded-md border border-[#30363d] bg-[#161b22] p-3.5 space-y-2 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-200 uppercase tracking-wide flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Flashbots RPC
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Flashbots Protect
             </span>
             <label className="relative inline-flex cursor-pointer items-center">
               <input
+                id="advanced-flashbots-protect-toggle"
                 type="checkbox"
-                checked={config.mevProtection}
-                onChange={(e) => setConfig((prev) => ({ ...prev, mevProtection: e.target.checked }))}
+                checked={config.flashbotsProtect !== false && config.mevProtection}
+                onChange={(e) => setConfig((prev) => ({ 
+                  ...prev, 
+                  mevProtection: e.target.checked,
+                  flashbotsProtect: e.target.checked 
+                }))}
                 className="peer sr-only"
               />
-              <div className="peer h-5 w-9 rounded-full bg-[#23282f] after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"></div>
+              <div className="peer h-5 w-9 rounded-full bg-[#23282f] after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"></div>
             </label>
           </div>
           <p className="text-[10px] text-slate-400">
-            {config.mevProtection ? 'Shielded from searcher sandwich bots via private mempool bundle.' : 'Unprotected public mempool.'}
+            {config.flashbotsProtect !== false && config.mevProtection 
+              ? 'Enforced private RPC (Flashbots Protect & MEV-Share) to eliminate frontrunning.' 
+              : 'Unprotected public mempool (exposed to frontrunning & sandwich attacks).'}
           </p>
+          <div className="pt-1 border-t border-[#23282f]">
+            <button
+              type="button"
+              onClick={() => {
+                const btn = document.getElementById('navbar-node-settings-btn');
+                if (btn) btn.click();
+              }}
+              className="w-full text-center py-1 rounded bg-[#0d1117] hover:bg-blue-600/20 text-blue-400 border border-blue-500/30 text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+            >
+              ⚙️ Enter Custom API Keys (Alchemy/QuickNode)
+            </button>
+          </div>
         </div>
 
       </div>
+
+      {/* Dedicated RPC Endpoints & Masked Private API Keys Settings Section */}
+      <CustomRpcApiKeySettings
+        activeNetwork={activeNetwork}
+        onConfigUpdated={() => {}}
+      />
 
       {/* Save Custom Strategy Modal */}
       {showSaveModal && (

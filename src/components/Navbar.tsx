@@ -14,11 +14,15 @@ import {
   ArrowUpRight,
   User,
   Crown,
-  Database
+  Database,
+  Sliders,
+  Cpu,
+  Server
 } from 'lucide-react';
 import { Network, BotConfig, BotStats, WalletState, UserProfile } from '../types';
 import { NETWORKS } from '../data/chainsAndDexes';
 import { checkAccessStatus } from '../services/userService';
+import { loadNodeConfig } from '../services/nodeService';
 
 interface NavbarProps {
   config: BotConfig;
@@ -34,6 +38,7 @@ interface NavbarProps {
   onOpenAuth: () => void;
   onOpenPaywall: () => void;
   onOpenUserSpace: () => void;
+  onOpenTransactionSettings?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -50,6 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuth,
   onOpenPaywall,
   onOpenUserSpace,
+  onOpenTransactionSettings,
 }) => {
   const access = checkAccessStatus(userProfile);
   const toggleBot = () => {
@@ -141,20 +147,33 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <div className="h-6 w-[1px] bg-[#23282f]"></div>
 
-          {/* Flashbots / MEV RPC Shield */}
-          <div className="flex flex-col items-start text-xs">
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">Mempool Guard</span>
-            <div className="flex items-center gap-1.5">
-              {config.mevProtection ? (
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-              ) : (
-                <ShieldAlert className="h-3.5 w-3.5 text-amber-400" />
-              )}
-              <span className="text-xs font-mono text-slate-300">
-                {config.mevProtection ? 'Flashbots RPC' : 'Public Pool'}
+          {/* Flashbots / MEV RPC Shield & Dedicated Node Settings */}
+          <button
+            onClick={onOpenTransactionSettings}
+            id="navbar-node-settings-btn"
+            title="Configure Dedicated RPC Node (Alchemy/QuickNode), Flashbots Private Bundles & Dynamic Slippage Floor"
+            className="flex items-center gap-2 hover:bg-[#21262d] px-2 py-1 rounded-lg transition-colors border border-transparent hover:border-[#30363d]"
+          >
+            <div className="flex flex-col items-start text-xs">
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1">
+                <span>Node & Mempool</span>
+                <Sliders className="h-2.5 w-2.5 text-blue-400" />
               </span>
+              <div className="flex items-center gap-1.5">
+                {config.mevProtection ? (
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                ) : (
+                  <ShieldAlert className="h-3.5 w-3.5 text-amber-400" />
+                )}
+                <span className="text-xs font-mono text-slate-300">
+                  {config.mevProtection ? 'Flashbots Relay' : 'Public Pool'}
+                </span>
+                <span className="text-[9px] bg-blue-950 text-blue-400 border border-blue-800/50 px-1 rounded uppercase">
+                  {loadNodeConfig().providerType}
+                </span>
+              </div>
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Right: User Profile, Wallet, Withdraw, and Engine Controls */}

@@ -223,10 +223,10 @@ export const WalletWithdrawModal: React.FC<WalletWithdrawModalProps> = ({
                     🔵 Coinbase
                   </button>
                   <button
-                    onClick={() => onConnectWallet('demo_vault')}
-                    className="p-2 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all"
+                    onClick={() => onConnectWallet('walletconnect')}
+                    className="p-2 rounded bg-[#161b22] border border-[#30363d] hover:border-purple-500 text-left text-xs text-slate-200 font-bold transition-all"
                   >
-                    ⚡ Fast Connect
+                    ⚡ WalletConnect
                   </button>
                 </div>
               </div>

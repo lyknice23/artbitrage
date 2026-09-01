@@ -530,6 +530,56 @@ export const UserDatabaseSpace: React.FC<UserDatabaseSpaceProps> = ({
             </div>
           </div>
 
+          {/* Direct RPC Node & API Key Management Card in User Database Space */}
+          <div className="rounded-xl border border-blue-500/30 bg-[#0d1117] p-5 shadow-lg space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#23282f] pb-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                  <Key className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                    <span>API Keys & Node Infrastructure Settings</span>
+                    <span className="text-[10px] bg-blue-950 text-blue-300 border border-blue-800/40 px-2 py-0.5 rounded font-mono uppercase">
+                      Alchemy / QuickNode / Infura
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Enter your own dedicated Web3 RPC API keys, private endpoints, and Flashbots protect relays.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const btn = document.getElementById('navbar-node-settings-btn');
+                  if (btn) btn.click();
+                }}
+                id="user-space-open-node-settings-btn"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-950 transition-all cursor-pointer"
+              >
+                <Key className="h-3.5 w-3.5" />
+                <span>Configure API Keys & Nodes</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div className="p-3 rounded-lg bg-[#161b22] border border-[#23282f]">
+                <div className="text-xs font-bold text-slate-200 mb-1">Alchemy API Key</div>
+                <div className="text-[11px] text-slate-400">High-speed global JSON-RPC with instant mempool websockets.</div>
+              </div>
+              <div className="p-3 rounded-lg bg-[#161b22] border border-[#23282f]">
+                <div className="text-xs font-bold text-slate-200 mb-1">QuickNode Endpoint</div>
+                <div className="text-[11px] text-slate-400">Dedicated hyper-node custom endpoint with sub-50ms latency.</div>
+              </div>
+              <div className="p-3 rounded-lg bg-[#161b22] border border-[#23282f]">
+                <div className="text-xs font-bold text-slate-200 mb-1">Infura Project ID</div>
+                <div className="text-[11px] text-slate-400">Enterprise Ethereum & Layer 2 multi-chain connectivity.</div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         {/* Right Column: 7-Day Free Trial Tracker & Paywall Plans ($100/mo vs $1,000/yr) */}

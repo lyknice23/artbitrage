@@ -5,6 +5,8 @@ export interface Network {
   chainId: number;
   iconColor: string;
   gasToken: string;
+  nativeCurrency?: string;
+  aavePoolAddress?: string;
   gasTokenPriceUsd: number;
   defaultGasPriceGwei: number;
   blockTimeSec: number;
@@ -21,6 +23,8 @@ export interface Token {
   color: string;
   isStable?: boolean;
 }
+
+export type TokenInfo = Token;
 
 export interface DexInfo {
   id: string;
@@ -103,6 +107,7 @@ export interface BotConfig {
   monitoredPairs: string[]; // Specified token pairs for monitoring e.g. ['WETH/USDC', 'WBTC/USDT']
   customPairs?: { base: string; quote: string }[];
   mevProtection: boolean;
+  flashbotsProtect?: boolean; // Force transactions through private RPC endpoints (Flashbots Protect / MEV-Share) to mitigate frontrunning
   gasMultiplier: number;
   simulateReverts: boolean;
   soundEffects: boolean;
@@ -140,7 +145,7 @@ export interface TradeLog {
   grossProfitUsd: number;
   gasCostUsd: number;
   netProfitUsd: number;
-  status: 'SUCCESS' | 'REVERTED_SLIPPAGE' | 'FRONTRUN_DETECTED' | 'GAS_EXCEEDED';
+  status: 'SUCCESS' | 'REVERTED_SLIPPAGE' | 'FRONTRUN_DETECTED' | 'GAS_EXCEEDED' | 'FAILED';
   txHash: string;
   blockNumber: number;
   latencyMs: number;
@@ -190,6 +195,21 @@ export interface VaultBalanceItem {
   color: string;
   address: string;
   isWithdrawable: boolean;
+  balance?: number;
+  usdValue?: number;
+  network?: string;
+  decimals?: number;
+  change24h?: number;
+  isNative?: boolean;
+}
+
+export interface LiveGasData {
+  gasPriceGwei: number;
+  baseFeeGwei: number;
+  priorityFeeGwei: number;
+  gasTokenPriceUsd: number;
+  blockNumber: number;
+  timestamp: number;
 }
 
 export interface WithdrawalRecord {
